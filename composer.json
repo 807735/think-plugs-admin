@@ -1,13 +1,13 @@
 {
   "type": "think-admin-plugin",
-  "name": "zoujingli/think-plugs-admin",
+  "name": "baolong/think-plugs-admin",
   "license": "MIT",
   "homepage": "https://thinkadmin.top",
   "description": "Admin Plugin for ThinkAdmin",
   "authors": [
     {
       "name": "Anyon",
-      "email": "zoujingli@qq.com"
+      "email": "baolong@qq.com"
     }
   ],
   "require": {
@@ -17,8 +17,8 @@
     "topthink/think-view": "^1.0|^2.0",
     "zoujingli/ip2region": "^1.0|^2.0|^3.0|@dev",
     "zoujingli/think-install": "^1.0|@dev",
-    "zoujingli/think-library": "^6.1|@dev",
-    "zoujingli/think-plugs-static": "^1.0|@dev"
+    "baolong/think-library": "^6.1|@dev",
+    "baolong/think-plugs-static": "^1.0|@dev"
   },
   "autoload": {
     "psr-4": {
