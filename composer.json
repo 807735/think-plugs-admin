@@ -13,7 +13,7 @@
   "require": {
     "php": ">7.1",
     "ext-json": "*",
-    "topthink/framework": "^6.0|^8.0",
+    "topthink/framework": "v8.1.2",
     "topthink/think-view": "^1.0|^2.0",
     "zoujingli/ip2region": "^1.0|^2.0|^3.0|@dev",
     "zoujingli/think-install": "^1.0|@dev",
