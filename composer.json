@@ -17,8 +17,8 @@
     "topthink/think-view": "^1.0|^2.0",
     "zoujingli/ip2region": "^1.0|^2.0|^3.0|@dev",
     "zoujingli/think-install": "^1.0|@dev",
-    "baolong/think-library": "^6.1|@dev",
-    "baolong/think-plugs-static": "^1.0|@dev"
+    "baolong/think-library": "dev-mastar",
+    "baolong/think-plugs-static": "dev-mastar"
   },
   "autoload": {
     "psr-4": {
