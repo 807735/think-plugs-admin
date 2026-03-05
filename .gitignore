@@ -1,4 +1,5 @@
 .env
+.git
 .svn
 .idea
 .fleet
