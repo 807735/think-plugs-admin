@@ -1,0 +1,93 @@
+{extend name="table"}
+
+{block name="button"}
+<!--{if auth("add")}-->
+<button data-table-id="SiteTable" data-modal='{:url("add")}' data-width="500px" class='layui-btn layui-btn-sm layui-btn-primary'>添加站点</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        {foreach ['index'=>lang('站点管理'),'recycle'=>lang('回 收 站')] as $k=>$v}{if isset($type) and $type eq $k}
+        <li data-open="{:url('index')}?type={$k}" class="layui-this">{$v}</li>
+        {else}
+        <li data-open="{:url('index')}?type={$k}">{$v}</li>
+        {/if}{/foreach}
+    </ul>
+    <div class="layui-tab-content">
+        {include file='site/index_search'}
+        <table id="SiteTable" data-url="{:sysuri()}" data-target-search="#SiteTableSearch"></table>
+    </div>
+</div>
+{/block}
+{block name='script'}
+<script>
+    $(function () {
+        $('#SiteTable').layTable({
+            even: true, height: 'full', loading: true,
+            sort: {field: 'id', type: 'desc'},
+            where: {type: "{$get.type|default='index'}"},
+            cols: [[
+                {field: 'id', hide: true},
+                {field: 'name', title: '站点名称', align: 'left', width: 150},
+                {field: 'user_id', title: '管理员账号', align: 'left', minWidth: 200, templet: '#ManageTpl'},
+                {field: 'status', title: '使用状态', align: 'center', width: 110, templet: '#StatusSwitchTpl'},
+                {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', width: 260, fixed: 'right'}
+            ]]
+        });
+        // 数据状态切换操作
+        layui.form.on('switch(StatusSwitch)', function (obj) {
+            var data = {id: obj.value, status: obj.elem.checked > 0 ? 1 : 0};
+            $.form.load("{:url('state')}", data, 'post', function (ret) {
+                if (ret.code < 1) $.msg.error(ret.info, 3, function () {
+                    $('#SiteTable').trigger('reload');
+                }); else {
+                    $('#SiteTable').trigger('reload')
+                }
+                return false;
+            }, false);
+        });
+    });
+
+</script>
+<script type="text/html" id="ManageTpl">
+    {{# if(d.user_id>0){ }}
+    {{d.user?.username}} 【{{d.user?.nickname}}】
+    <a class="margin-left-10" data-action="{:url('unbind')}" data-rule="id#{{d.id}};user_id#{{d.user_id}}"  data-confirm="确认解除绑定信息么">解除绑定</a>
+    {{# }else{ }}
+    <span class="layui-font-red">== 未绑定 ==</span>
+    <a class="margin-left-10" data-modal="{:url('bindManage')}?id={{d.id}}">绑定账户</a>
+    {{# } }}
+</script>
+
+<!-- 数据状态切换模板 -->
+<script type="text/html" id="StatusSwitchTpl">
+    <!--{if auth("state")}-->
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="{:lang('已激活')}|{:lang('已禁用')}" lay-filter="StatusSwitch" {{-d.status>0?'checked':''}}>
+    <!--{else}-->
+    {{-d.status ? '<b class="color-green">{:lang("已激活")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}
+    <!--{/if}-->
+</script>
+<script type="text/html" id="toolbar">
+    {if isset($type) and $type eq 'index'}
+    <!--{if auth("edit")}-->
+    <a class="layui-btn layui-btn-sm" data-event-dbclick data-width="500px" data-title="{:lang('编辑站点')}" data-modal='{:url("edit")}?id={{d.id}}'>{:lang('编 辑')}</a>
+    <!--{/if}-->
+    <!--{if auth("manage")}-->
+    <a class="layui-btn layui-btn-sm layui-btn-normal" data-title="{:lang('设置管理员')}" data-modal='{:url("manage")}?id={{d.id}}'>{:lang('管理员')}</a>
+    <!--{/if}-->
+    <!--{if auth("switchSite")}-->
+    <a class="layui-btn layui-btn-sm layui-btn-danger" data-title="{:lang('切换到站点')}"
+       data-site="{:url('switchSite')}" data-value="id#{{d.id}}" data-confirm="切换站点将退出当前【{$username}】账号<br/>并切换到对应站点管理员账号；<br/>确认切换到当前站点么？">{:lang('切换站点')}</a>
+    <!--{/if}-->
+    {else}
+    <!--{if auth("edit")}-->
+    <a class="layui-btn layui-btn-sm" data-event-dbclick data-width="500px" data-title="{:lang('编辑站点')}" data-modal='{:url("edit")}?id={{d.id}}'>{:lang('编 辑')}</a>
+    <!--{/if}-->
+    <!--{if auth("remove")}-->
+    <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="{:lang('确定要永久删除吗？')}" data-action="{:url('remove')}" data-value="id#{{d.id}}">{:lang('删 除')}</a>
+    <!--{/if}-->
+    {/if}
+</script>
+{/block}

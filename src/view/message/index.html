@@ -1,0 +1,92 @@
+{extend name='table'}
+
+{block name="button"}
+<!--{if $site_id == 0 && auth('task')}-->
+<a data-table-id="MessageData" class="layui-btn layui-btn-sm layui-btn-primary" data-queue="{:url('task')}">启动短信任务</a>
+<!--{/if}-->
+<!--{if auth('config')}-->
+<a data-table-id="MessageData"  class="layui-btn layui-btn-sm layui-btn-primary" data-modal="{:url('config')}">短信配置</a>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title notselect">
+        {foreach $scenes as $k => $v}{if isset($type) and $type eq $k}
+        <li class="layui-this" data-open="{:url('index')}?type={$k}">
+            {$v.name}
+            {if isset($v.total) && $v.total > 0}<sup class="layui-font-red padding-left-5">[{$v.total|default='0'}]</sup> {/if}
+        </li>
+        {else}
+        <li data-open="{:url('index')}?type={$k}">
+            {$v.name}
+            {if isset($v.total) && $v.total > 0}<sup class="layui-font-red padding-left-5">[{$v.total|default='0'}]</sup> {/if}
+        </li>
+        {/if}{/foreach}
+    </ul>
+    <div class="layui-tab-content">
+        {include file='message/index_search'}
+        <table id="MessageData" data-line="2" data-url="{:request()->url()}" data-target-search="form.form-search"></table>
+    </div>
+</div>
+{/block}
+
+{block name='script'}
+<label class="layui-hides">
+    <textarea id="SecensData">{$scenes|default='[]'|json_encode}</textarea>
+</label>
+
+<script>
+    function showScene(scene) {
+        let secens = JSON.parse($('#SecensData').val() || '{}');
+        return secens[scene].name || scene;
+    }
+    $(function () {
+        $('#MessageData').layTable({
+            even: true, height: 'full', loading: true,
+            sort: {field: 'id', type: 'desc'},
+            where:{type:"{$type}"},
+            cols: [[
+                {field: 'id', hide: true},
+                {field: 'scene', title: '业务场景', align: 'left', width: 150,  templet: function (d) {
+                        let tpls = [];
+                        tpls.push('<div class="sub-span-text"><b>场景:</b><span class="margin-left-10">{{-showScene(d.scene)}}</span> </div>') ;
+                        tpls.push('<div class="sub-span-text"><b>标识:</b><span class="margin-left-10">{{d.scene}}</span> </div>') ;
+                        return laytpl("<div class='nowrap '>" + tpls.join('') + "</div>").render(d);
+                    }},
+                {field: 'mobile', title: '接受者', align: 'left', width: 150,  templet: function (d) {
+                        let tpls = [];
+                        tpls.push('<div class="sub-span-text"><b>手机:</b><span class="margin-left-10">{{d.mobile}}</span> </div>') ;
+                        tpls.push('<div class="sub-span-blue"><b>模版:</b><span class="margin-left-10 pointer" data-tips-text="{{d.template||\'-\'}}">模版内容</span> </div>') ;
+                        return laytpl("<div class='nowrap '>" + tpls.join('') + "</div>").render(d);
+                    }},
+                {field: 'title', title: '说明', width: 150 ,templet:function (d) {
+                        return laytpl("<div style='white-space: normal;'>" + d.title + "</div>").render(d);
+                    }},
+                {field: 'plan_time', title: '时间', width: 203,templet:function (d) {
+                        let tpls = [];
+                        tpls.push('<div class="sub-span-text"><b>计划:</b><span class="margin-left-10">{{d.plan_time}}</span> </div>') ;
+                        tpls.push('<div class="sub-span-text"><b>创建:</b><span class="margin-left-10">{{d.create_time}}</span> </div>') ;
+                        return laytpl("<div class='nowrap '>" + tpls.join('') + "</div>").render(d);
+                }},
+                {field: 'content', title: '发送内容', minWidth: 150,  align: 'left',templet:function (d) {
+                        return laytpl("<div style='white-space: normal;'>" + (d.content||'<span class="color-desc">-</span>') + "</div>").render(d);
+                }},
+                {field: 'status', title: '执行结果', width: 203,align: 'left',templet:function (d) {
+                        let tpls = [];
+                        // 短信状态(0失败，1等待发送，2发送中，3发送完成)
+                        d.status_text = [
+                            '<span class="color-red margin-left-10 pointer" data-tips-text="'+(d.send_remark)+'">发送失败</span> ',
+                            '<span class="margin-left-10">等待发送</span>',
+                            '<span class="margin-left-10">发送中</span>',
+                            '<span class="margin-left-10">发送完成</span>',
+                        ][d.status];
+                        tpls.push('<div class="sub-span-text"><b>状态:</b>{{-d.status_text}}</div>') ;
+                        tpls.push('<div class="sub-span-text"><b>创建:</b><span class="margin-left-10">{{d.send_time}}</span> </div>') ;
+                        return laytpl("<div class='nowrap '>" + tpls.join('') + "</div>").render(d);
+                    }},
+            ]]
+        });
+    });
+</script>
+{/block}

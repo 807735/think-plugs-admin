@@ -16,13 +16,14 @@
 namespace app\admin\controller;
 
 
-use app\manage\service\OpenService;
 use think\admin\Controller;
 use OpenClient as Open;
 use think\admin\Exception;
 use think\admin\helper\QueryHelper;
+use think\admin\model\SystemOpenApi;
 use think\admin\model\SystemOpenClient;
 use think\admin\service\AdminService;
+use think\admin\service\OpenService;
 
 /**
  * 中间件参数配置
@@ -41,16 +42,17 @@ class Openapi extends Controller
      */
     public function index(){
         $this->vo = [];
-        SystemOpenClient::mQuery()->layTable(function (){
+        SystemOpenApi::mQuery()->layTable(function (){
             $this->title = "接口调用记录";
         },function (QueryHelper $query){
-            $query->equal('model,status')->dateBetween('create_time');
+            $query->where(['site_id' => $this->site_id])->equal('model,status')->dateBetween('create_time');
         });
     }
 
     public function information(){
-        SystemOpenClient::mForm('information');
+        SystemOpenApi::mForm('information');
     }
+
     protected function _information_form_filter(&$data){
         $data['request'] = json_encode($data['request'],JSON_UNESCAPED_UNICODE);
         $data['response'] = json_encode($data['response'],JSON_UNESCAPED_UNICODE);
@@ -76,7 +78,7 @@ class Openapi extends Controller
      * @throws Exception
      */
     public function status(){
-        $vo = sysdata('open');
+        $vo = AdminService::getSite('openapi');
         if (empty($vo) || empty($vo['app_path']) || empty($vo['app_code']) || empty($vo['appsecret'])){
             die(  "<span class='color-red pointer' data-tips-text='参数错误'>参数错误，请正确输入接口参数</span>" );
         }
@@ -110,11 +112,11 @@ class Openapi extends Controller
      */
     public function form(){
         if ($this->request->isGet()) {
-            $this->vo = sysdata('open');
+            $this->vo = AdminService::getSite('openapi');
             $this->fetch();
         } else {
             $post = $this->request->post('open');
-            sysdata('open', $post);
+            AdminService::setSite('openapi',$post);
             $this->success('接口地址保存成功！');
         }
     }

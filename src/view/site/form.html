@@ -1,0 +1,28 @@
+<form action="{:sysuri()}" method="post" data-auto="true" data-table-id="SiteTable" class="layui-form layui-card">
+
+    <div class="layui-card-body padding-left-40">
+        <div class="layui-row layui-col-space20">
+
+            <label class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">站点名称</span>
+                <span class="nowrap color-desc">如：帮扶家 </span>
+                <input class="layui-input"  value="{$vo.name|default=''}"  placeholder="请输入站点名称" name="name">
+            </label>
+
+            <div class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">站点说明</span>
+                <textarea name="describe" class="layui-textarea" placeholder="请输入数据内容">{$vo.describe|default=''}</textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="hr-line-dashed"></div>
+
+    <div class="layui-form-item text-center">
+        {notempty name='vo.id'}<input type='hidden' value='{$vo.id}' name='id'>{/notempty}
+        <button class="layui-btn" type='submit'>保存数据</button>
+        <button class="layui-btn layui-btn-danger" data-close type='button' data-confirm="确定要取消修改吗？">取消编辑</button>
+    </div>
+</form>
+

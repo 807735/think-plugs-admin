@@ -19,6 +19,13 @@
     <ul class="layui-nav layui-layout-right">
         <li lay-unselect class="layui-nav-item"><a data-reload><i class="layui-icon layui-icon-refresh-3"></i></a></li>
         {if session('user.username')}
+
+        {if session('user.usertype') == 'site'}
+        <li lay-unselect class="layui-nav-item"><a >
+            <i class="layui-icon layui-icon-template-1"></i>
+            <span class="margin-left-5">{$site.name|default=''}</span>
+        </a></li>
+        {/if}
         <li class="layui-nav-item">
             <dl class="layui-nav-child">
                 <dd lay-unselect><a data-modal="{:sysuri('admin/index/info',['id'=>session('user.id')])}"><i class="layui-icon layui-icon-set-fill"></i> {:lang('基本资料')}</a></dd>

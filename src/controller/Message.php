@@ -19,11 +19,11 @@ declare (strict_types=1);
 namespace app\admin\controller;
 
 use think\admin\model\SystemMsms;
-use app\manage\service\Message as MessageService;
-use app\manage\service\OpenService;
+use think\admin\service\Message as MessageService;
 use think\admin\Controller;
 use think\admin\helper\QueryHelper;
 use think\admin\service\AdminService;
+use think\admin\service\OpenService;
 
 /**
  * 短信计划管理
@@ -46,7 +46,7 @@ class Message extends Controller
     protected function initialize(): void
     {
         parent::initialize();
-        $this->smskey = 'plugin.common.smscfg';
+        $this->smskey = 'smscfg';
     }
 
 
@@ -65,13 +65,11 @@ class Message extends Controller
         SystemMsms::mQuery()->layTable(function (QueryHelper $query) {
             $this->title = '短信计划管理';
             $this->scenes =  array_merge(['ALL' => ['name' => '全部场景','state' => 1,'total' => 0]], MessageService::getScenes() );
-            foreach ($query->db()->field('scene,count(1) total')->group('scene')->cursor() as $vo) {
+            foreach ($query->where(['site_id' => $this->site_id])->db()->field('scene,count(1) total')->group('scene')->cursor() as $vo) {
                 [$this->scenes[$vo['scene']]['total'] = $vo['total'], $this->scenes['ALL']['total'] += $vo['total']];
             }
-
-
-//            foreach ($this->scenes as $k => $vo) if ($vo['state'] == 0) unset($this->scenes[$k]);
         },  function (QueryHelper $query) {
+            $query->where(['site_id' => $this->site_id]);
             if ($this->type != 'ALL')  $query->where(['scene' => $this->type]);
             $query->equal('status')->like('scene,mobile')->dateBetween('create_time');
         });
@@ -94,7 +92,8 @@ class Message extends Controller
                 if ($v['type'] == 'instant' && empty($v['template']) ) $this->error("【{$v['name']}】 模版编号不能为空！");
                 if ($v['type'] == 'instant' && empty($v['content']) ) $this->error("【{$v['name']}】 模版内容不能为空！");
             }
-            sysdata($this->smskey, $config);
+
+            AdminService::setSite($this->smskey, $config);
             $this->success('修改配置成功！');
         }
     }

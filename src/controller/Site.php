@@ -16,11 +16,11 @@
 
 namespace app\admin\controller;
 
-use app\manage\model\SystemSite;
 use think\admin\Controller;
 use think\admin\helper\QueryHelper;
 use think\admin\model\SystemAuth;
 use think\admin\model\SystemBase;
+use think\admin\model\SystemSite;
 use think\admin\model\SystemUser;
 use think\admin\service\AdminService;
 
@@ -156,7 +156,7 @@ class Site extends Controller
     }
 
     /**
-     * 切换站点
+     * * 切换站点
      * @auth true
      * @return void
      */

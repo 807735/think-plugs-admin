@@ -1,0 +1,59 @@
+{extend name="table"}
+
+{block name="button"}
+<!--{if $site_id == 0 && auth('clean')}-->
+<a data-table-id="OpenClientTable" class="layui-btn layui-btn-sm layui-btn-primary" data-queue="{:url('common/base.open_client/clean')}">{:lang('自动清楚过期数据')}</a>
+<!--{/if}-->
+<!--{if auth('form')}-->
+<button data-modal="{:url('form')}" data-width="600px" data-title="Ucenter参数配置" class='layui-btn layui-btn-sm layui-btn-primary'>接口参数</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="think-box-notify" type="info">
+    <b>状态：</b><b class="margin-right-5" data-open-message><span class="color-desc">检查中</span></b>
+    <script>$('[data-open-message]').load('{:sysuri("admin/openapi/status")}');</script>
+</div>
+
+<div class="think-box-shadow">
+    {include file='openapi/index_search'}
+    <table id="OpenClientTable" data-line="2" data-url="{:request()->url()}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+    $(function () {
+        $('#OpenClientTable').layTable({
+            even: true, height: 'full',
+            sort: {field: 'id', type: 'desc'},
+            cols: [[
+                {
+                    field: 'id', title: '任务名称', minWidth: 350, sort: true, templet: function (d) {
+                        return laytpl('编号：<b>{{d.code}}</b><br>组件：{{d.model}}').render(d);
+                    }
+                },
+                {
+                    field: 'id', title: '参数', width: 200, sort: true, templet: function (d) {
+                        return laytpl('请求体：<a class="color-blue" data-modal="{:url(\'information\')}?id={{d.id}}&type=request" data-title="请求体数据">查看详情</a> <br>响应体：<a class="color-green"  data-modal="{:url(\'information\')}?id={{d.id}}&type=response" data-title="响应体数据">查看详情</a>').render(d);
+                    }
+                },
+                {
+                    field: 'id', title: '请求', width: 220, sort: true, templet: function (d) {
+                        if (d.status === 0) {
+                            d.statusText = '<span class="layui-badge think-bg-red">请求失败</span>';
+                        } else {
+                            d.statusText = '<span class="layui-badge think-bg-green">请求成功</span>';
+                        }
+                        return laytpl('状态：<b>{{-d.statusText}}</b><br>时间：{{d.create_time}}').render(d);
+                    }
+                },
+            ]]
+        });
+    });
+</script>
+
+<script type="text/html" id="toolbar">
+
+</script>
+{/block}
