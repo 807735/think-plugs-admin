@@ -18,7 +18,7 @@ declare (strict_types=1);
 
 namespace app\admin\controller;
 
-use app\manage\model\SystemMsms;
+use think\admin\model\SystemMsms;
 use app\manage\service\Message as MessageService;
 use app\manage\service\OpenService;
 use think\admin\Controller;
