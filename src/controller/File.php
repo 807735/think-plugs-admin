@@ -31,7 +31,6 @@ use think\db\exception\ModelNotFoundException;
 
 /**
  * 系统文件管理.
- * @class File
  */
 class File extends Controller
 {
@@ -54,8 +53,9 @@ class File extends Controller
         SystemFile::mQuery()->layTable(function () {
             $this->title = '系统文件管理';
             $this->xexts = SystemFile::mk()->distinct()->column('xext');
-        }, static function (QueryHelper $query) {
-            $query->like('name,hash,xext')->equal('type')->dateBetween('create_at');
+        },  function (QueryHelper $query) {
+            if ($this->site_id > 0)  $query->where('site_id',$this->site_id);
+            $query->with('site')->like('name,hash,xext')->equal('type')->dateBetween('create_at');
             $query->where(['issafe' => 0, 'status' => 2, 'uuid' => AdminService::getUserId()]);
         });
     }
@@ -75,7 +75,7 @@ class File extends Controller
      */
     public function remove()
     {
-        if (!AdminService::isSuper()) {
+        if (!AdminService::isSuper() || !AdminService::isSiteSuper()) {
             $where = ['uuid' => AdminService::getUserId()];
         }
         SystemFile::mDelete('', $where ?? []);
@@ -88,7 +88,7 @@ class File extends Controller
      */
     public function distinct()
     {
-        $map = ['issafe' => 0, 'uuid' => AdminService::getUserId()];
+        $map = ['issafe' => 0, 'uuid' => AdminService::getUserId(),'site_id' => $this->site_id];
         // 使用派生表包装子查询，避免直接引用同一表
         $keepSubQuery = SystemFile::mk()->fieldRaw('MAX(id) AS id')->where($map)->group('type, xkey')->buildSql();
         // 使用 whereNotExists 配合派生表子查询删除，避免 1093 错误和 whereIn

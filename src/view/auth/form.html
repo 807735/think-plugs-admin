@@ -24,6 +24,7 @@
             </div>
             <div class="hr-line-dashed"></div>
             {notempty name='vo.id'}<input name="id" value="{$vo.id}" type="hidden"/>{/notempty}
+            <input name="site_id" value="{$vo.site_id|default=$site_id}" type="hidden"/>
             <div class="layui-form-item text-center">
                 <button data-target-submit class="layui-btn">{:lang('保存数据')}</button>
                 <button data-target-backup class="layui-btn layui-btn-danger" type="button">{:lang('取消编辑')}</button>

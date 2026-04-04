@@ -88,6 +88,21 @@ class Plugs extends Controller
     }
 
     /**
+     * 水印
+     * @return \think\response\View
+     * @throws Exception
+     */
+    public function watermark(): \think\response\View
+    {
+        [$username,$nickname,$siteName] = [session('user.username'),session('user.nickname'),AdminService::getSite('name',sysconf('site_name'))];
+        [$width,$height] = [200,100];
+        $siteName = "<text x='30%' y='50%' font-size='12' transform='rotate(-18)' fill='#666666' fill-opacity='0.2' text-anchor='middle' dominant-baseline='middle'>{$siteName}</text>";
+        $username = "<text x='30%' y='70%' font-size='12' transform='rotate(-18)' fill='#666666' fill-opacity='0.2' text-anchor='middle' dominant-baseline='middle'>{$nickname} / {$username}</text>";
+        $css = "<svg width='{$width}' height='{$height}' xmlns='http://www.w3.org/2000/svg'>{$siteName}{$username}</svg>";
+        $css = str_replace( ['%','#','<','>'],  ['%25','%23','%3C','%3E'],  $css);
+        return view(dirname(__DIR__, 2) . '/view/api/watermark.js', ['css' => "data:image/svg+xml,{$css}" ])->contentType('application/x-javascript');
+    }
+    /**
      * 优化数据库.
      * @login true
      */

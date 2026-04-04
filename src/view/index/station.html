@@ -1,0 +1,67 @@
+<div class="relative padding-10"  style="height: 620px;">
+    <form action="{:sysuri()}" autocomplete="off" data-table-id="SiteTableSelect" class="layui-form layui-form-pane form-search" method="get" onsubmit="return false">
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">商户信息</label>
+            <label class="layui-input-inline">
+                <input class="layui-input" name="name" placeholder="商户名称或者ID" value="{$get.name|default=''}">
+            </label>
+        </div>
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">创建时间</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" data-date-range name="create_time" placeholder="请选择创建时间" value="{$get.create_time|default=''}">
+            </div>
+        </div>
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> 搜 索</button>
+        </div>
+    </form>
+
+    <table id="SiteTableSelect" data-url="{:request()->url()}"></table>
+</div>
+<script type="text/html" id="SiteManageTpl">
+    {{# if(d.user_id>0){ }}
+        {{d.user?.username}} 【{{d.user?.nickname}}】
+    {{# }else{ }}
+        <span class="layui-font-red">== 未绑定 ==</span>
+    {{# } }}
+</script>
+
+<!-- 数据状态切换模板 -->
+<script type="text/html" id="SiteStatusSwitchTpl">
+    {{-d.status ? '<b class="color-green">{:lang("已激活")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}
+</script>
+<script>
+    $(function () {
+        $('#SiteTableSelect').layTable({
+            even: true, width: 'full', height: '576px', page: true,
+            sort: {field: 'create_time desc, id', type: 'desc'},
+            cols: [[
+                // {checkbox: true},
+                {field: 'id', hide: true},
+                {field: 'id', title: '商户ID', width: 120, align: 'center'},
+                {field: 'name', title: '商户名称', minWidth: 150, align: 'left'},
+                {field: 'people_limit', title: '人数限制', align: 'left', width: 80,templet:(d) => {
+                        return `限制 <b>${d.people_limit}</b>   人`
+                    }},
+                {field: 'user_id', title: '商户管理员', align: 'left', width: 200, templet: '#SiteManageTpl'},
+                {field: 'status', title: '使用状态', align: 'center', width: 80, templet: '#SiteStatusSwitchTpl'},
+                {field: 'create_time', title: '创建时间', width: 170, align: 'center'},
+                {toolbar: '#SelectToolbar', title: '操作面板', width: 90, align: 'center', fixed: 'right'},
+            ]]
+        });
+    });
+</script>
+
+<!-- 操作工具条模板 -->
+<script type="text/html" id="SelectToolbar">
+    {{# if(d.user_id == 0){ }}
+    <a class="layui-btn layui-btn-sm layui-btn-disabled"  >切 换</a>
+    {{# }else{ }}
+    <a class="layui-btn layui-btn-sm" data-title="切换商户"
+       data-site="{:url('switchSite')}" data-value="id#{{d.id}}"
+       data-confirm="您将切换到账号【{{d.user.nickname}}】身份登录？">切 换</a>
+    {{# } }}
+
+
+</script>

@@ -30,7 +30,6 @@ use think\exception\HttpResponseException;
 
 /**
  * 系统日志管理.
- * @class Oplog
  */
 class Oplog extends Controller
 {
@@ -49,9 +48,11 @@ class Oplog extends Controller
             $columns = SystemOplog::mk()->column('action,username', 'id');
             $this->users = array_unique(array_column($columns, 'username'));
             $this->actions = array_unique(array_column($columns, 'action'));
-        }, static function (QueryHelper $query) {
-            $query->dateBetween('create_at')->equal('username,action')->like('content,geoip,node');
+        },  function (QueryHelper $query) {
+            if ($this->site_id > 0)  $query->where('site_id',$this->site_id);
+            $query->with('site')->dateBetween('create_at')->equal('username,action')->like('content,geoip,node');
         });
+
     }
 
     /**

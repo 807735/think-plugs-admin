@@ -48,8 +48,8 @@ class Auth extends Controller
     {
         SystemAuth::mQuery()->layTable(function () {
             $this->title = '系统权限管理';
-        }, static function (QueryHelper $query) {
-            $query->like('title,desc')->equal('status,utype')->dateBetween('create_at');
+        },  function (QueryHelper $query) {
+            $query->where(['site_id' => $this->site_id])->like('title,desc')->equal('status,utype')->dateBetween('create_at');
         });
     }
 
@@ -103,7 +103,7 @@ class Auth extends Controller
             if ($this->app->isDebug()) {
                 AdminService::clear();
             }
-            $ztree = AdminService::getTree(empty($data['id']) ? [] : SystemNode::mk()->where(['auth' => $data['id']])->column('node'));
+            $ztree = AdminService::getTree(empty($data['id']) ? [] : SystemNode::mk()->where(['site_id' => $this->site_id,'auth' => $data['id']])->column('node'));
             usort($ztree, static function ($a, $b) {
                 if (explode('-', $a['node'])[0] !== explode('-', $b['node'])[0]) {
                     if (stripos($a['node'], 'plugin-') === 0) {
@@ -128,7 +128,7 @@ class Auth extends Controller
     protected function _form_result(bool $state, array $post)
     {
         if ($state && $this->request->post('action') === 'save') {
-            [$map, $data] = [['auth' => $post['id']], []];
+            [$map, $data] = [['site_id' => $this->site_id,'auth' => $post['id']], []];
             foreach ($post['nodes'] ?? [] as $node) {
                 $data[] = $map + ['node' => $node];
             }

@@ -52,7 +52,7 @@ class User extends Controller
             $this->bases = SystemBase::items('身份权限');
         }, function (QueryHelper $query) {
             // 加载对应数据列表
-            $query->where(['is_deleted' => 0, 'status' => intval($this->type === 'index')]);
+            $query->where(['site_id' => $this->site_id,'is_deleted' => 0, 'status' => intval($this->type === 'index')]);
 
             // 关联用户身份资料
             /* @var \think\model\Relation|\think\db\Query $query */
@@ -149,11 +149,19 @@ class User extends Controller
         if ($this->request->isPost()) {
             // 检查资料是否完整
             empty($data['username']) && $this->error('登录账号不能为空！');
-            if ($data['username'] !== AdminService::getSuperName()) {
+
+            if ($this->site_id == 0 && $data['username'] !== AdminService::getSuperName() ) {
                 empty($data['authorize']) && $this->error('未配置权限！');
             }
+
+            if ($this->site_id > 0 && isset($data['id']) && (string)$data['id'] !== (string)AdminService::getSite('user_id') ) {
+                empty($data['authorize']) && $this->error('未配置权限！');
+            }
+
             // 处理上传的权限格式
             $data['authorize'] = arr2str($data['authorize'] ?? []);
+            $data['site_id'] = $this->site_id;
+
             if (empty($data['id'])) {
                 // 检查账号是否重复
                 $map = ['username' => $data['username'], 'is_deleted' => 0];
@@ -179,7 +187,7 @@ class User extends Controller
      */
     private function _checkInput()
     {
-        if (in_array('10000', str2arr(input('id', '')))) {
+        if (in_array(AdminService::getSite('user_id'),str2arr(input('id', ''))) || in_array('10000', str2arr(input('id', '')))) {
             $this->error('系统超级账号禁止删除！');
         }
     }

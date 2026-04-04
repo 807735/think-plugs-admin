@@ -4,13 +4,25 @@
         <div class="layui-row layui-col-space20">
 
             <label class="layui-col-sm12 block relative">
-                <span class="color-green margin-right-10 font-w7">站点名称</span>
+                <span class="color-green margin-right-10 font-w7">商户名称</span>
                 <span class="nowrap color-desc">如：帮扶家 </span>
-                <input class="layui-input"  value="{$vo.name|default=''}"  placeholder="请输入站点名称" name="name">
+                <input class="layui-input"  value="{$vo.name|default=''}"  placeholder="请输入商户名称" name="name">
+            </label>
+
+            <label class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">人数限制</span>
+                <span class="nowrap color-desc">家庭组内人数最高限制 </span>
+                <input class="layui-input" type="number" value="{$vo.people_limit|default=''}"  placeholder="请输入人数限制" name="people_limit">
+            </label>
+
+            <label class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">到期时间</span>
+                <span class="nowrap color-desc">超出则系统无法使用，截止到所选日期 23:59:59</span>
+                <input class="layui-input" data-date-input="date"  value="{$vo.expire_time|default=''}"  placeholder="请输入到期时间" name="expire_time">
             </label>
 
             <div class="layui-col-sm12 block relative">
-                <span class="color-green margin-right-10 font-w7">站点说明</span>
+                <span class="color-green margin-right-10 font-w7">商户说明</span>
                 <textarea name="describe" class="layui-textarea" placeholder="请输入数据内容">{$vo.describe|default=''}</textarea>
             </div>
 
@@ -18,6 +30,7 @@
     </div>
 
     <div class="hr-line-dashed"></div>
+
 
     <div class="layui-form-item text-center">
         {notempty name='vo.id'}<input type='hidden' value='{$vo.id}' name='id'>{/notempty}

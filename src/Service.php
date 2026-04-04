@@ -20,7 +20,14 @@ declare(strict_types=1);
 
 namespace app\admin;
 
+use app\admin\command\Msg;
+use app\admin\service\Notify;
+use think\admin\Exception;
+use think\admin\extend\CodeExtend;
 use think\admin\Plugin;
+use think\admin\service\OpenService;
+use think\exception\HttpResponseException;
+use think\Request;
 
 /**
  * 插件服务注册.
@@ -38,7 +45,30 @@ class Service extends Plugin
      * 定义安装包名.
      * @var string
      */
-    protected $package = 'zoujingli/think-plugs-admin';
+    protected $package = 'baolong/think-plugs-admin';
+
+    /**
+     * 插件服务注册.
+     */
+    public function register(): void
+    {
+        $this->commands([Msg::class]);
+
+        // 注册中间件异步通知路由
+        $this->app->route->any('/openapi-notify/:vars', function (Request $request){
+            try {
+                $site_id = json_decode(CodeExtend::deSafe64($request->param('vars')), true)['site_id']??false;
+                if ($site_id === false)  throw new Exception('URL参数错误');
+                sysvar('api_site_id',$site_id);
+                $this->notify = OpenService::OpenNotify();
+                [$AppCode,$EventType,$EventData ] = $this->notify->checkSignature();
+                if ($EventType == 'check_url') $this->notify->success('效验通过');
+                Notify::mk($this->notify,$AppCode, $EventType,$EventData);
+            } catch (Exception|\OpenClient\Contracts\Exception $exception){
+               throw new HttpResponseException(json(['code' => 0, 'info' => $exception->getMessage(), 'data' => []]));
+            }
+        });
+    }
 
     /**
      * 定义插件中心菜单.

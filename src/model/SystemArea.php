@@ -23,17 +23,9 @@ use think\admin\model\Abs;
 use think\model\relation\HasOne;
 
 /**
- * 商城商品数据数据
- * @class MallGoods
- * @package app\mall\model
+ * 系统地址表
  */
-class BaseSyncData extends Abs
+class SystemArea extends Abs
 {
-    /**
-     * 获取家庭组信息
-     * @return HasOne
-     */
-    public function family():HasOne{
-        return $this->hasOne(DataFamily::class,'code','family_code');
-    }
+
 }

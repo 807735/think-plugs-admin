@@ -32,7 +32,7 @@ use think\db\exception\ModelNotFoundException;
 
 /**
  * 系统菜单管理.
- * @class Menu
+ * @site admin
  */
 class Menu extends Controller
 {

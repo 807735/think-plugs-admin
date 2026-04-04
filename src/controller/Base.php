@@ -29,7 +29,7 @@ use think\db\exception\ModelNotFoundException;
 
 /**
  * 数据字典管理.
- * @class Base
+ * @site admin
  */
 class Base extends Controller
 {

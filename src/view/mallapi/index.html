@@ -4,9 +4,11 @@
 <!--{if $site_id == 0 && auth('clean')}-->
 <a data-table-id="OpenClientTable" class="layui-btn layui-btn-sm layui-btn-primary" data-queue="{:url('common/base.open_client/clean')}">{:lang('自动清楚过期数据')}</a>
 <!--{/if}-->
-<!--{if auth('form')}-->
-<button data-modal="{:url('form')}" data-width="600px" data-title="参数配置" class='layui-btn layui-btn-sm layui-btn-primary'>接口参数</button>
+
+<!--{if $site_id == 0 && auth('form')}-->
+<button data-modal="{:url('form')}" data-width="600px" data-title="参数配置" class='layui-btn layui-btn-sm layui-btn-primary'>商城接口参数</button>
 <!--{/if}-->
+
 {/block}
 
 {block name="content"}

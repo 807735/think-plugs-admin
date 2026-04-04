@@ -1,12 +1,12 @@
 <?php
 
 declare (strict_types=1);
-namespace app\common\service\notify\km;
+namespace app\admin\service\notify\km;
 
-use app\common\model\BaseSyncData;
+use app\admin\model\BaseSyncData;
 use app\admin\service\Notify;
-use app\common\service\OpenService;
-use app\data\service\ConfigService;
+use think\admin\service\OpenService;
+use think\admin\service\ConfigService;
 use think\admin\Exception;
 
 /**
@@ -22,7 +22,7 @@ class Retail extends Notify
      public function create(): void
      {
          try {
-             if (empty( ConfigService::get('kemai_sync_state')))  $this->notify->error('系统未开通积分兑换功能',[],2);
+             if (empty( ConfigService::get('switchcfg.kemai_sync_state')))  $this->notify->error('系统未开通积分兑换功能',[],2);
              if ($this->EventData['Retail']['SellWay'] == 'B'){
                  $base = BaseSyncData::mk()->where(['code' =>$this->EventData['Retail']['VoucherId']])->whereIn('status',[1,2,3])->findOrEmpty();
                  if ($base->isEmpty()){

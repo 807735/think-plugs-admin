@@ -26,6 +26,11 @@
             cols: [[
                 {checkbox: true},
                 {field: 'id', title: 'ID', width: 80, sort: true, align: 'center'},
+                /*{if $site_id==0}*/
+                {field: 'site_id', title: '{:lang("所属商户")}', minWidth: 100, width: '6%', sort: true, align: 'center',templet:(d) =>{
+                    return d.site?.name||'平台'
+                    }},
+                /*{/if}*/
                 {field: 'username', title: '{:lang("操作账号")}', minWidth: 100, width: '8%', sort: true, align: 'center'},
                 {field: 'node', title: '{:lang("操作节点")}', minWidth: 120},
                 {field: 'action', title: '{:lang("操作行为")}', minWidth: 120},

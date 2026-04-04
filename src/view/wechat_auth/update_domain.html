@@ -1,0 +1,25 @@
+<form action="{:request()->url()}" method="post" data-auto="true" class="layui-form layui-card shadow-none">
+
+
+    <div class="layui-card-body padding-left-40">
+        <fieldset class="layui-bg-gray">
+            <legend><b class="layui-badge think-bg-violet">{:lang('用户账号')}</b></legend>
+
+            <label class="relative block">
+                <span class="help-label"><b>{:lang('联系邮箱')}</b>Contact Email</span>
+                <input name="contact_mail" value='{$vo.contact_mail|default=""}' pattern="email" vali-name="{:lang('联系邮箱')}" placeholder="{:lang('请输入联系电子邮箱')}" class="layui-input">
+                <span class="color-desc">{:lang('可选，请填写用户常用的电子邮箱')}</span>
+            </label>
+
+        </fieldset>
+
+
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    <input type="hidden" name="config.type" value="api">
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type="submit">保存配置</button>
+    </div>
+</form>

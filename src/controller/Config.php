@@ -21,8 +21,10 @@ declare(strict_types=1);
 namespace app\admin\controller;
 
 use think\admin\Controller;
+use think\admin\model\SystemSite;
 use think\admin\Plugin;
 use think\admin\service\AdminService;
+use think\admin\service\ConfigService;
 use think\admin\service\ModuleService;
 use think\admin\service\RuntimeService;
 use think\admin\service\SystemService;
@@ -33,7 +35,7 @@ use think\admin\storage\TxcosStorage;
 
 /**
  * 系统参数配置.
- * @class Config
+ * @site admin
  */
 class Config extends Controller
 {
@@ -61,6 +63,7 @@ class Config extends Controller
         $this->files = Storage::types();
         $this->plugins = Plugin::get(null, true);
         $this->issuper = AdminService::isSuper();
+        $this->issitesuper = AdminService::isSiteSuper();
         $this->systemid = ModuleService::getRunVar('uni');
         $this->framework = ModuleService::getLibrarys('topthink/framework');
         $this->thinkadmin = ModuleService::getLibrarys('zoujingli/think-library');
@@ -87,34 +90,43 @@ class Config extends Controller
         if ($this->request->isGet()) {
             $this->title = '修改系统参数';
             $this->themes = static::themes;
-            $this->fetch();
+            $this->vo = SystemSite::mk()->where(['id' => $this->site_id])->findOrEmpty();
+            $this->fetch('system_'.AdminService::getUserType() );
         } else {
             $post = $this->request->post();
-            // 修改网站后台入口路径
-            if (!empty($post['xpath'])) {
-                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $post['xpath'])) {
-                    $this->error('后台入口格式错误！');
+            if ($this->site_id == 0){
+                // 修改网站后台入口路径
+                if (!empty($post['xpath'])) {
+                    if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $post['xpath'])) {
+                        $this->error('后台入口格式错误！');
+                    }
+                    if ($post['xpath'] !== 'admin') {
+                        if (is_dir(syspath("app/{$post['xpath']}")) || !empty(Plugin::get($post['xpath']))) {
+                            $this->error(lang('已存在 %s 应用！', [$post['xpath']]));
+                        }
+                    }
+                    RuntimeService::set(null, [$post['xpath'] => 'admin']);
                 }
-                if ($post['xpath'] !== 'admin') {
-                    if (is_dir(syspath("app/{$post['xpath']}")) || !empty(Plugin::get($post['xpath']))) {
-                        $this->error(lang('已存在 %s 应用！', [$post['xpath']]));
+                // 修改网站 ICON 图标，替换 public/favicon.ico
+                if (preg_match('#^https?://#', $post['site_icon'] ?? '')) {
+                    try {
+                        SystemService::setFavicon($post['site_icon'] ?? '');
+                    } catch (\Exception $exception) {
+                        trace_file($exception);
                     }
                 }
-                RuntimeService::set(null, [$post['xpath'] => 'admin']);
-            }
-            // 修改网站 ICON 图标，替换 public/favicon.ico
-            if (preg_match('#^https?://#', $post['site_icon'] ?? '')) {
-                try {
-                    SystemService::setFavicon($post['site_icon'] ?? '');
-                } catch (\Exception $exception) {
-                    trace_file($exception);
+                // 数据数据到系统配置表
+                foreach ($post as $k => $v) {
+                    sysconf($k, $v);
                 }
+
+                sysoplog('系统配置管理', '修改系统参数成功');
+            }else{
+                $siteCacheKey = md5(json_encode(['SystemSite',$this->site_id ],JSON_UNESCAPED_UNICODE));
+                SystemSite::mk()->master()->cache($siteCacheKey)->where(['id' => $this->site_id ])->save($post);
+                sysoplog('系统配置管理', '修改系统参数成功');
             }
-            // 数据数据到系统配置表
-            foreach ($post as $k => $v) {
-                sysconf($k, $v);
-            }
-            sysoplog('系统配置管理', '修改系统参数成功');
+
             $this->success('数据保存成功！', admuri('admin/config/index'));
         }
     }

@@ -22,6 +22,8 @@ namespace app\admin\controller;
 
 use think\admin\Controller;
 use think\admin\Exception;
+use think\admin\helper\QueryHelper;
+use think\admin\model\SystemSite;
 use think\admin\model\SystemUser;
 use think\admin\service\AdminService;
 use think\admin\service\MenuService;
@@ -31,7 +33,6 @@ use think\db\exception\ModelNotFoundException;
 
 /**
  * 后台界面入口.
- * @class Index
  */
 class Index extends Controller
 {
@@ -44,19 +45,24 @@ class Index extends Controller
      */
     public function index()
     {
+
         /* ! 根据运行模式刷新权限 */
         AdminService::apply($this->app->isDebug());
         /* ! 读取当前用户权限菜单树 */
         $this->menus = MenuService::getTree();
+
         /* ! 判断当前用户的登录状态 */
         $this->login = AdminService::isLogin();
+
         /* ! 菜单为空且未登录跳转到登录页 */
         if (empty($this->menus) && empty($this->login)) {
             $this->redirect(sysuri('admin/login/index'));
         } else {
             $this->title = '系统管理后台';
             $this->super = AdminService::isSuper();
+            $this->siteSuper = AdminService::isSiteSuper();
             $this->theme = AdminService::getUserTheme();
+            $this->adminUser = $this->app->session->get('adminUser');
             $this->fetch();
         }
     }
@@ -81,6 +87,44 @@ class Index extends Controller
             }
         }
     }
+
+    /**
+     * 切换商户
+     * @login true
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function station(){
+        SystemSite::mQuery()->layTable(null,function (QueryHelper $query){
+            $query->with(['user','wechatAuth'])->where(['deleted' => 0,'status' => 1]);
+            $query->equal('id|name#name')->dateBetween('create_time');
+        });
+    }
+    /**
+     * * 切换商户
+     * @auth true
+     * @return void
+     */
+    public function switchSite(){
+        $map = $this->_vali([
+            'id.require' => '参数错误',
+        ]);
+        $site = SystemSite::mk()->with('user')->where($map)->findOrEmpty();
+        $user = $site->getAttr('user');
+        // 是否平台管理
+        $admin = $this->app->session->get('user');
+        $adminUser = $this->app->session->get('adminUser');
+
+        if ($admin['site_id'] == 0 || $adminUser){
+            $this->app->session->set('adminUser', $admin['id']>0?:$adminUser );
+        }
+
+
+        $this->app->session->set('user', $user->toArray());
+        $this->success('登录成功', sysuri('admin/index/index'));
+    }
+
 
     /**
      * 修改用户资料.

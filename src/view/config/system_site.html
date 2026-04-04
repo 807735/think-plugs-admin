@@ -1,0 +1,103 @@
+<form action="{:sysuri()}" method="post" data-auto="true" class="layui-form layui-card">
+
+    <div class="layui-card-body padding-left-40">
+        <div class="flex">
+            <div class="layui-form-item flex-1">
+                <span class="help-label"><b>商户名称</b>Name</span>
+                <div class="relative block">
+                    <input class="layui-input" name="name" placeholder="请输入应用名称"  value='{$vo.name|default=""}'>
+                </div>
+                <span class="help-block">商户名称前端应用显示名称。</span>
+            </div>
+
+            <div class="layui-form-item flex-1 ta-ml-15">
+                <span class="help-label"><b>商户简称</b>Sub Name</span>
+                <div class="relative block">
+                    <input class="layui-input" name="sub_name" placeholder="请输入商户简称"  value='{$vo.sub_name|default=""}'>
+                </div>
+                <span class="help-block">用于系统简短名称显示。</span>
+            </div>
+
+            <div class="layui-form-item flex-1 ta-ml-15">
+                <div class="help-label label-required-prev"><b>{:lang('后台默认配色')}</b>Theme Style</div>
+                <select class="layui-select" name="site_theme" lay-filter="SiteTheme">
+                    {foreach $themes as $k=>$v}{if isset($vo.site_theme) && $vo.site_theme eq $k}
+                    <option selected value="{$k}">{$v}</option>
+                    {else}
+                    <option value="{$k}">{$v}</option>
+                    {/if}{/foreach}
+                </select>
+            </div>
+        </div>
+
+
+
+        <div class="flex">
+            <div class="layui-form-item flex-1">
+                <span class="help-label"><b>商户LOGO</b>Logo</span>
+                <div class="relative block">
+                    <input class="layui-input layui-bg-gray" readonly pattern="url" data-tips-image data-tips-hover placeholder="请上传应用图标" value="{$vo.logo|default=''}" name="site_logo">
+                    <a class="input-right-icon layui-icon layui-icon-upload-drag" data-file data-type="png,jpg,jpeg,gif" data-field="site_logo"></a>
+                </div>
+                <span class="help-block">请上传商户LOGO，建议使用 200 x 200 尺寸或同比例图片。</span>
+            </div>
+
+            <div class="layui-form-item flex-1 ta-ml-15">
+                <span class="help-label"><b>商户小图标</b>Icon</span>
+                <div class="relative block">
+                    <input class="layui-input layui-bg-gray" readonly pattern="url" data-tips-image data-tips-hover placeholder="请上传应用小图标" value="{$vo.site_sub_logo|default=''}" name="site_sub_logo">
+                    <a class="input-right-icon layui-icon layui-icon-upload-drag" data-file data-type="png,jpg,jpeg,gif" data-field="site_sub_logo"></a>
+                </div>
+                <span class="help-block">请上传应用图标，建议使用 50 x 50 尺寸或同比例图片。</span>
+            </div>
+        </div>
+
+        <div class="flex">
+            <div class="layui-form-item flex-1 ">
+                <span class="help-label label-required-prev"><b>应用开关</b>State</span>
+                <div class="layui-textarea help-checks layui-bg-gray ta-pl-15">
+                    {empty name='vo.enable_state'}{assign name='vo.enable_state' value='0'}{/empty}
+                    {foreach ['禁用','启用'] as $k=>$n}
+                    {if (isset($vo.enable_state) && $vo.enable_state eq $k)}
+                    <input checked type="radio" name="enable_state" value="{$k}" title="{$n}">
+                    {else}
+                    <input type="radio" name="enable_state" value="{$k}" title="{$n}">
+                    {/if}{/foreach}
+                </div>
+            </div>
+
+            <label class="layui-form-item flex-1 ta-ml-15">
+                <span class="help-label"><b>禁用说明</b>Info</span>
+                <input class="layui-input" name="enable_info" placeholder="请输入禁用说明"  value='{$vo.enable_info|default=""}'>
+                <span class="help-block">系统禁用后，页面显示的文字。</span>
+            </label>
+        </div>
+
+        <label class="layui-form-item relative block">
+            <span class="help-label"><b>版权信息</b>Copyright</span>
+            <textarea class="layui-textarea" name="copyright">{$vo.copyright|default="\\n"|raw}</textarea>
+        </label>
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type="submit">{:lang('保存配置')}</button>
+        <button class="layui-btn layui-btn-danger" type='button' data-confirm="{:lang('确定要取消修改吗？')}" data-close>{:lang('取消修改')}</button>
+    </div>
+</form>
+
+<script>
+    $('[name=login_image]').uploadMultipleImage();
+    require(['md5'], function (md5) {
+        $('body').off('click', '#RefreshJwtKey').on('click', '#RefreshJwtKey', function () {
+            $(this).parent().find('input').val(md5.hash(Date.toString() + Math.random()));
+        });
+    });
+    layui.form.on('select(SiteTheme)', function (data) {
+        var alls = '', prox = 'layui-layout-theme-', curt = prox + data.value;
+        $(data.elem.options).map(function () {
+            if (this.value !== data.value) alls += ' ' + prox + this.value;
+        });
+        $('.layui-layout-body').removeClass(alls).addClass(curt)
+    });
+</script>

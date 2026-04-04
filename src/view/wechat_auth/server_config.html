@@ -1,0 +1,21 @@
+<div >
+    <div class="hr-line-dashed"></div>
+    <div class="layui-form-item margin-bottom-20">
+        <label class="layui-form-label"><b>域名检测</b><br><span class="nowrap color-desc">小程序域名检测</span></label>
+        <div class="layui-input-block padding-top-5">
+            {foreach $check as $key => $vo}
+            <div class="flex ">
+                <div class="flex-1">
+                    <b class="flex-1 margin-right-10">{$vo.name}</b>
+                    {if $vo.status == 1}
+                    <b class="color-green">{$vo.msg}</b>
+                    {else}
+                    <b class="color-red">{$vo.msg}</b>
+                    {/if}
+                </div>
+                <a data-action="{:url('serverConfig')}?action=domain&type={$key}"  data-confirm="将小程序的域名更新为{$http}">同步服务端域名</a>
+            </div>
+            {/foreach}
+        </div>
+    </div>
+</div>

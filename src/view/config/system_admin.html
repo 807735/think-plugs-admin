@@ -15,7 +15,6 @@
                     <input autofocus required pattern="[a-zA-Z_][a-zA-Z0-9_]*" vali-name="{:lang('登录入口')}" placeholder="{:lang('请输入后台登录入口')}" class="layui-input inline-block padding-0 border-0" style="width:100px;background:none" value="{:substr(sysuri('admin/index/index',[],false), strlen(sysuri('@')))}" name="xpath">
                 </label>
             </div>
-
             <div class="layui-col-xs4 padding-bottom-0">
                 <div class="help-label label-required-prev"><b>{:lang('后台默认配色')}</b>Theme Style</div>
                 <select class="layui-select" name="site_theme" lay-filter="SiteTheme">

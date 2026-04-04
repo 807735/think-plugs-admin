@@ -34,7 +34,8 @@
         {if !empty($bases) || !empty($auths)}
         <fieldset class="layui-bg-gray">
             <legend><b class="layui-badge think-bg-violet">{:lang('用户权限')}</b></legend>
-            {if !empty($bases)}
+
+            {if !empty($bases) && $site_id == 0}
             <div class="layui-form-item">
                 <div class="help-label"><b>{:lang('角色身份')}</b>Role Identity</div>
                 <div class="layui-textarea help-checks">
@@ -49,12 +50,16 @@
                     {/foreach}
                 </div>
             </div>
+            {elseif $site_id > 0}
+            <input type="hidden" name="usertype" value="site">
             {/if}
+
+
             {if !empty($auths)}
             <div class="layui-form-item">
                 <div class="help-label"><b>{:lang('访问权限')}</b>Role Permission</div>
                 <div class="layui-textarea help-checks">
-                    {if isset($vo.username) and $vo.username eq $super}
+                    {if isset($vo.username) and ( $vo.username eq $super || $vo.id eq $site.user_id) }
                     <span class="color-desc padding-left-5">{:lang('超级用户拥所有访问权限，不需要配置权限。')}</span>
                     {else}{foreach $auths as $authorize}
                     <label class="think-checkbox">

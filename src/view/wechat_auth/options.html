@@ -1,0 +1,119 @@
+{extend name="main"}
+
+{block name="button"}
+<!--{if auth('options_wxapp')}-->
+<button data-modal="{:url('options_wxapp')}" data-width="600px" data-title="{:lang('绑定小程序')}" class='layui-btn layui-btn-sm layui-btn-primary'>{:lang('绑定小程序')}</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow margin-top-15">
+    <div class="layui-card-header border-0" style="height:auto">
+        <div class="layui-bg-gray padding-20 border-radius-5" style="line-height:2em">
+            {:lang('使用微信开放平台授权模式时，微信将授权给第三方服务平台托管系统，消息数据使用 %s 通信协议转发。',['<span>JsonRpc</span>'])}
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+
+    <div class="layui-card-body layui-form flex">
+
+        <form action="{:request()->url()}" method="post" data-auto="true" class="flex-1 layui-card shadow-none margin-right-40">
+                <!--{if !empty($wechat)}-->
+                <div class="layui-form-item margin-bottom-20">
+                    <label class="layui-form-label"><b>QRCode</b><br><span class="nowrap color-desc">公众号二维码</span></label>
+                    <div class="layui-input-block">
+                        <div class="pull-left notselect">
+                            <div class="shadow" data-tips-image data-lazy-src="{$wechat.qrcode_url|down_file|default=''}" style="width:95px;height:95px"></div>
+                        </div>
+                        <div class="pull-left padding-left-10">
+                            <p class="nowrap">微信昵称：{$wechat.user_nickname|default='-'}  {if $wechat.deleted==1}<b class="color-red margin-left-20" data-tips-text="请检查小程序后台是否解绑当前开放平台">账号异常</b>{/if} </p>
+                            <p class="nowrap">微信类型：{$wechat.service_type|default='-'} / {$wechat.service_verify == '未认证' ? '未认证' : '<span class="color-green">已认证</span>'}</p>
+                            <p class="nowrap">注册公司：{$wechat.user_company|default='-'}</p>
+                            <p class="nowrap">授权绑定：{$wechat.create_at|format_datetime}</p>
+                        </div>
+                    </div>
+                </div>
+
+            <div data-load-page="{:sysuri('serverConfig')}"> </div>
+
+            <div class="hr-line-dashed"></div>
+                <!--{/if}-->
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><b>Authorize</b><br><span class="nowrap color-desc">绑定微信授权</span></label>
+                    <div class="layui-input-block">
+                        <button type="button" data-href="{$authurl|default=''}" class="layui-btn layui-btn-sm layui-btn-primary">重新绑定公众号</button>
+                        <p class="help-block">点击链接将跳转到微信第三方平台进行公众号授权。</p>
+                        {if !empty($message)}<p class="color-red">{$message|default=''}</p>{/if}
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><b>AppId</b><br><span class="nowrap color-desc">公众号 AppId</span></label>
+                    <div class="layui-input-block">
+                        <input name="config.thr_appid" vali-name="微信APPID" placeholder="请输入以wx开头的18位公众号AppId（必填）" pattern="^wx[0-9a-z]{16}$" maxlength="18" required value="{$vo.thr_appid|default=''}" class="layui-input">
+                        <p class="help-block">众号 appid 通过微信第三方授权自动获取. 若没有值请进行微信第三方授权。</p>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><b>AppKey</b><br><span class="nowrap color-desc">服务接口密钥</span></label>
+                    <div class="layui-input-block">
+                        <label class="relative block">
+                            <input name="config.thr_appkey" vali-name="接口密钥" required placeholder="请输入32位第三方平台接口密钥AppKey（必填）" value="{$vo.thr_appkey|default=''}" maxlength="32" pattern="^[0-9a-z]{32}$" class="layui-input">
+                            <p class="help-block">公众号服务平台接口密钥, 通过微信第三方授权自动获取, 若没有值请进行微信第三方授权。</p>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><b>PushApi</b><br><span class="nowrap color-desc">服务推送接口</span></label>
+                    <div class="layui-input-block">
+                        <label class="relative block">
+                            <input value="{$thrNotify}" disabled class="layui-input layui-bg-gray">
+                            <a data-copy="{$thrNotify}" class="layui-icon layui-icon-release input-right-icon"></a>
+                        </label>
+                        <p class="help-block">公众号绑定服务平台接口通知 URL, 公众号消息接收与回复等。</p>
+                    </div>
+                </div>
+
+                <div class="hr-line-dashed"></div>
+                <input type="hidden" name="config.type" value="thr">
+
+                <div class="layui-form-item text-center">
+                    <button class="layui-btn" type="submit">保存配置</button>
+                </div>
+        </form>
+        <!--{if !empty($wechat) && $wechat.deleted==0}-->
+        <div data-load-page="{:sysuri('getTrialVersion')}" data-load-key="getTrialVersion" class="flex-1 flex-align-center flex-justify-center think-bg-gray border-radius-6 margin-left-40">
+            <div class="margin-bottom-40 flex flex-align-center color-desc">
+                <span class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop font-s28"></span>
+                <span class="font-s18 margin-left-10">数据加载中....</span>
+            </div>
+        </div>
+        <!--{/if}-->
+
+<!--        <div class="flex-1">-->
+<!--            <div data-load-page="{:sysuri('serverConfig')}" class=" margin-row-40"> </div>            -->
+<!--        </div>-->
+    </div>
+
+
+
+
+</div>
+{/block}
+
+{block name='script'}
+<label class="layui-hide">
+    <textarea id="templates">{$templates|default='[]'|raw}</textarea>
+</label>
+
+<script>
+    $(function () {
+        $('[data-load-page]').each(function (a,b) {
+            $(this).load(this.dataset.loadPage)
+        })
+    })
+</script>
+{/block}

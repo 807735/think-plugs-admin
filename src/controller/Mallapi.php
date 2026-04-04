@@ -28,11 +28,11 @@ use think\admin\service\OpenService;
 
 
 /**
- * 中间件参数配置.
- * @site site
+ * 商城参数配置.
+ * @site admin,site
  * @class Menu
  */
-class Openapi extends Controller
+class Mallapi extends Controller
 {
     /**
      * 接口调用记录
@@ -74,37 +74,6 @@ class Openapi extends Controller
         }
     }
 
-    /**
-     * 获取状态
-     * @return void
-     * @throws Exception
-     */
-    public function status(){
-        $vo = AdminService::getSite('openapi');
-        if (empty($vo) || empty($vo['app_path']) || empty($vo['app_code']) || empty($vo['appsecret'])){
-            die(  "<span class='color-red pointer' data-tips-text='参数错误'>参数错误，请正确输入接口参数</span>" );
-        }
-        [$state,$info] = Open::App($vo)->check();
-        if ($state){
-            [,,$vo] = OpenService::OpenApp()->info();
-
-            $code = $vo['app']['code']??'-';
-            $name = $vo['app']['name']??'-';
-            $companyCode =  $vo['app']['company']['code']??'-';
-            $companyName = $vo['app']['company']['name']??'-';
-
-            $appConfig = "<b data-tips-text='公司编码：{$companyCode}' class='pointer color-blue font-s12 font-w9'>公司名称：{$companyName}</b> ";
-            $appConfig .= "<span class='ta-mr-10 ta-ml-5 layui-font-blue'>|</span><b data-tips-text='应用编码：{$code}' class='pointer color-blue font-s12 font-w9'>应用名称：{$name}</b> ";
-
-            echo "
-            <span class='color-green pointer' data-tips-text='通讯成功'>通讯成功</span> 
-            <span class='ta-mr-40 layui-font-gray'></span>  
-            <span class='color-text'>接口信息：</span> 
-            <div class='font-w1 inline-block'>{$appConfig}</div> ";
-        }else{
-            echo "<span class='color-red pointer' data-tips-text='{$info}'>通讯失败 - {$info}</span>";
-        }
-    }
 
     /**
      * 接口参数
@@ -114,20 +83,20 @@ class Openapi extends Controller
      */
     public function form(){
         if ($this->request->isGet()) {
-            $this->vo = AdminService::getSite('openapi');
+
             $this->geoip = $this->app->cache->get('mygeoip', '');
             if (empty($this->geoip)) {
                 $this->geoip = gethostbyname($this->request->host());
                 $this->app->cache->set('mygeoip', $this->geoip, 360);
             }
-            $data = ['site_id' => $this->site_id];
-            $vars = CodeExtend::enSafe64(json_encode( $data, 64 | 256));
-            $this->thrNotify = sysuri('@openapi-notify', [], false, true). "/{$vars}";
+            $this->vo = sysdata('mallapi.config');
 
-            $this->fetch('openapi/form');
+            $this->thrNotify = sysuri('@help-api', [], false, true). "/";
+            $this->fetch();
         } else {
-            $post = $this->request->post('openapi');
-            AdminService::setSite('openapi',$post);
+            $post = $this->request->post('open');
+            sysdata('mallapi.config',$post);
+//            AdminService::setSite('mallapi',$post);
             $this->success('接口地址保存成功！');
         }
     }

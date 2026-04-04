@@ -1,0 +1,58 @@
+{extend name="table"}
+
+
+{block name="content"}
+<div class="think-box-shadow">
+    <table id="LevelTable" data-url="{:request()->url()}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+
+    $(function () {
+        let $table = $('#LevelTable').layTable({
+            even: true, height: 'full',
+            sort: {field: 'number', type: 'asc'},
+            cols: [[
+                {field: 'LAY_INDEX', title: '行标', align: "center", width: 70,templet: '<div>{{-d.LAY_INDEX}}</div>'},
+                {field: 'command', title: '任务命令', align: 'left',width: 200},
+                {field: 'title', title: '任务名称', align: "left",  sort: true},
+                {field: 'loops', title: '循环时间', align: 'center', width: 80, templet: '<div>{{-d.loops}}秒</div>'},
+                {field: 'status', title: '执行状态', align: 'center', width: 80, templet: '#statusTpl'},
+                {toolbar: '#toolbar', title: '操作面板', align: 'center', width: 100, fixed: 'right'},
+            ]]
+        });
+    });
+</script>
+<script type="text/html" id="statusTpl">
+
+    {{# if(d.id){ }}
+    <span class="color-green">已启动 </span>
+
+    {{# }else{ }}
+        <span class="color-desc">未启动</span>
+    {{# } }}
+
+</script>
+<!-- 数据操作工具条模板 -->
+<script type="text/html" id="toolbar">
+
+
+    {{# if(d.id){ }}
+    <!--{if auth('remove')}-->
+    <a class='layui-btn layui-btn-sm layui-btn-danger' data-confirm="{:lang('确定要删除该记录吗？')}" data-action='{:url("admin/queue/remove")}' data-value="id#{{d.id}}">停止任务</a>
+    <!--{else}-->
+    <a class="layui-btn layui-btn-danger layui-btn-sm layui-btn-disabled" >停止任务</a>
+    <!--{/if}-->
+
+    {{# }else{ }}
+    <!--{if auth('sync')}-->
+    <a class="layui-btn layui-btn-primary layui-btn-sm" data-table-id="LevelTable"  data-queue='{:url("sync")}?key={{d.LAY_INDEX}}'>启动任务</a>
+    <!--{else}-->
+    <a class="layui-btn layui-btn-primary layui-btn-sm layui-btn-disabled" >启动任务</a>
+    <!--{/if}-->
+    {{# } }}
+
+</script>
+{/block}

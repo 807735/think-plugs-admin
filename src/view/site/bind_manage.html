@@ -70,29 +70,7 @@
             </fieldset>
             <input type="hidden"  name="usertype" value="site" lay-ignore>
 
-            {if !empty($auths)}
-            <fieldset class="layui-bg-gray">
-                <legend><b class="layui-badge think-bg-violet">{:lang('用户权限')}</b></legend>
-                {if !empty($auths)}
-                <div class="layui-form-item">
-                    <div class="help-label"><b>{:lang('访问权限')}</b>Role Permission</div>
-                    <div class="layui-textarea help-checks">
-                        {if isset($vo.username) and $vo.username eq $super}
-                        <span class="color-desc padding-left-5">{:lang('超级用户拥所有访问权限，不需要配置权限。')}</span>
-                        {else}{foreach $auths as $authorize}
-                        <label class="think-checkbox">
-                            {if in_array($authorize.id, $vo.authorize)}
-                            <input type="checkbox" checked name="authorize[]" value="{$authorize.id}" lay-ignore>{$authorize.title}
-                            {else}
-                            <input type="checkbox" name="authorize[]" value="{$authorize.id}" lay-ignore>{$authorize.title}
-                            {/if}
-                        </label>
-                        {/foreach}{/if}
-                    </div>
-                </div>
-                {/if}
-            </fieldset>
-            {/if}
+
 
             <fieldset class="layui-bg-gray">
                 <legend><b class="layui-badge think-bg-violet">{:lang('用户资料')}</b></legend>

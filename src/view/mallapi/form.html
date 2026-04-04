@@ -1,0 +1,49 @@
+<form action="{:request()->url()}" method="post" data-auto="true" class="layui-form layui-card shadow-none">
+
+    <div class="layui-card-body padding-left-40">
+        <div class="layui-row layui-col-space20">
+            <label class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">服务端地址</span>
+                <span class="nowrap color-desc">接口服务地址 </span>
+                <input name="open.app_path" required vali-name="服务端地址" placeholder="请输入服务端地址（必填）" value="{$vo.app_path|default=''}" class="layui-input">
+            </label>
+
+<!--            <label class="layui-col-sm12 block relative">-->
+<!--                <span class="color-green margin-right-10 font-w7">Mall Id</span>-->
+<!--                <span class="nowrap color-desc">站点ID </span>-->
+<!--                <input name="open.app_code" vali-name="接口AppCode" placeholder="请输入接口AppCode（必填）" required="required" value="{$vo.app_code|default=''}" class="layui-input">-->
+<!--            </label>-->
+
+
+            <label class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">AppSecret</span>
+                <span class="nowrap color-desc">对称秘钥 </span>
+                <input name="open.appsecret" required vali-name="接口密钥"
+                       placeholder="请输入32位公众号接口密钥AppSecret（必填）" value="{$vo.appsecret}" maxlength="32" pattern="^[0-9a-z]{32}$" class="layui-input">
+            </label>
+
+            <label class="layui-col-sm12 block relative">
+                <span class="color-green margin-right-10 font-w7">PushApi</span>
+                <span class="nowrap color-desc">消息推送接收 </span>
+                <div class="">
+                    <label class="relative block">
+                        <input value="服务器授权IP：{$geoip}" disabled class="layui-input layui-bg-gray">
+                        <a data-copy="{$geoip}" class="layui-icon layui-icon-release input-right-icon"></a>
+                    </label>
+                    <label class="relative block margin-top-5">
+                        <input value="消息推送地址：{$thrNotify}" disabled class="layui-input layui-bg-gray">
+                        <a data-copy="{$thrNotify}" class="layui-icon layui-icon-release input-right-icon"></a>
+                    </label>
+                    <p class="help-block">中间件服务平台消息推送接口及服务器授权IP地址，需在中间件接口开发处配置。</p>
+                </div>
+            </label>
+
+        </div>
+    </div>
+
+    <div class="hr-line-dashed"></div>
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type="submit">保存配置</button>
+    </div>
+</form>

@@ -58,7 +58,6 @@
         </div>
     </div>
 </div>
-<!--{/notempty}-->
 
 <div class="layui-card padding-20 shadow">
     <div class="layui-card-header notselect">
@@ -90,7 +89,10 @@
         </div>
     </div>
 </div>
+<!--{/notempty}-->
 
+
+<!--{if $site_id == 0}-->
 <div class="layui-card padding-20 shadow">
     <div class="layui-card-header notselect">
         <span class="help-label">
@@ -152,6 +154,39 @@
         </div>
     </div>
 </div>
+<!--{/if}-->
+<!--{if $site_id > 0}-->
+<div class="layui-card padding-20 shadow">
+    <div class="layui-card-header notselect">
+        <span class="help-label">
+            <b style="color:#333!important;">{:lang('商户参数')}</b>( {:lang('当前商户配置参数')} )
+        </span>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <div class="help-label"><b>{:lang('网站名称')}</b>Website</div>
+            <label class="relative block">
+                <input readonly value="{:getSite('name')}" class="layui-input layui-bg-gray">
+            </label>
+        </div>
+        <div class="layui-form-item">
+            <div class="help-label"><b>{:lang('网站简称')}</b>SubName</div>
+            <label class="relative block">
+                <input readonly value="{:getSite('sub_name')}" class="layui-input layui-bg-gray">
+            </label>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="help-label"><b>{:lang('网站版权信息')}</b>Copyright</div>
+            <label class="relative block">
+                <input readonly value="{:getSite('copyright')}" class="layui-input layui-bg-gray">
+            </label>
+            <div class="help-block">{:lang('网站版权信息，在后台登录页面显示版本信息并链接到备案到信息备案管理系统。')}</div>
+        </div>
+    </div>
+</div>
+<!--{/if}-->
+
 
 <!--{if $app->isDebug()}-->
 <div class="layui-card padding-20 shadow">

@@ -1,0 +1,38 @@
+<fieldset>
+    <legend>{:lang('条件搜索')}</legend>
+    <form class="layui-form layui-form-pane form-search" action="{:sysuri()}" onsubmit="return false" method="get" autocomplete="off">
+        {if isset($vo.auth)}
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">组件</label>
+                <label class="layui-input-inline">
+                    <select name="type" class="layui-select">
+                        <option value=''>-- 全部 --</option>
+                        {foreach $vo.auth as $v}
+                        {if isset($get.type) and $get.type eq $v.type}
+                        <option selected value="{$v.type|default=''}">{$v.name|default=''}</option>
+                        {else}
+                        <option value="{$v.type|default=''}">{$v.name|default=''}</option>
+                        {/if}{/foreach}
+                    </select>
+                </label>
+            </div>
+        {/if}
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">请求编号</label>
+            <label class="layui-input-inline">
+                <input name="code" value="{$get.code|default=''}" placeholder="{:lang('请输入请求编号')}" class="layui-input">
+            </label>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">请求时间</label>
+            <label class="layui-input-inline">
+                <input data-date-range name="create_time" value="{$get.create_time|default=''}" placeholder="请选择请求时间" class="layui-input">
+            </label>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> {:lang('搜 索')}</button>
+        </div>
+    </form>
+</fieldset>

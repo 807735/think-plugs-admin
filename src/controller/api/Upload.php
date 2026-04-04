@@ -84,7 +84,7 @@ class Upload extends Controller
             } else {
                 $query->where($unid ? ['unid' => $unid] : ['uuid' => $uuid]);
             }
-            $query->where(['status' => 2, 'issafe' => 0])->in('xext#type');
+            $query->where(['site_id' => $this->site_id, 'status' => 2, 'issafe' => 0])->in('xext#type');
             $query->like('name,hash')->dateBetween('create_at')->order('id desc');
         });
     }
@@ -109,6 +109,7 @@ class Upload extends Controller
                 'size.require' => '大小不能为空！',
                 'mime.default' => '',
                 'status.value' => 1,
+                'site_id.value' => $this->site_id
             ]));
             $mime = $file->getAttr('mime');
             if (empty($mime)) {

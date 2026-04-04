@@ -33,7 +33,7 @@ use think\exception\HttpResponseException;
 
 /**
  * 系统任务管理.
- * @class Queue
+ * @site admin
  */
 class Queue extends Controller
 {

@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-    <title>{block name="title"}{$title|default=''}{if !empty($title)} · {/if}{:sysconf('site_name')}{/block}</title>
+    <title>{block name="title"}{$title|default=''}{if !empty($title)} · {/if}{$site.name|default=sysconf('site_name')}{/block}</title>
     <meta charset="utf-8">
     <meta name="renderer" content="webkit">
     <meta name="format-detection" content="telephone=no">
@@ -34,7 +33,15 @@
     <!-- 顶部菜单 开始 -->
     {include file='index/index-top'}
     <!-- 顶部菜单 结束 -->
-
+    {if $site_id > 0 && $site.expire.state > 0 }
+    <div class="MarkBox">
+        {if $site.expire.state == 1}
+        <div class='insideBox layui-bg-purple shadow'>{$site.expire.admin_message|default=''}</div>
+        {else}
+        <div class='insideBox layui-bg-black shadow'>{$site.expire.admin_message|default=''}</div>
+        {/if}
+    </div>
+    {/if}
     <!-- 主体内容 开始 -->
     <div class="layui-body">
         <div class="think-page-body">

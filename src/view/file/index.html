@@ -22,6 +22,11 @@
             cols: [[
                 {checkbox: true, fixed: true},
                 {field: 'id', title: 'ID', width: 80, align: 'center', sort: true},
+                /*{if $site_id==0}*/
+                {field: 'site_id', title: '{:lang("所属商户")}', minWidth: 100, width: '6%', sort: true, align: 'center',templet:(d) =>{
+                        return d.site?.name||'平台'
+                    }},
+                /*{/if}*/
                 {field: 'name', title: '{:lang("文件名称")}', width: '12%', align: 'center'},
                 {field: 'hash', title: '{:lang("文件哈希")}', width: '15%', align: 'center', templet: '<div><code>{{d.hash}}</code></div>'},
                 {field: 'size', title: '{:lang("文件大小")}', align: 'center', width: '7%', sort: true, templet: '<div>{{-$.formatFileSize(d.size)}}</div>'},

@@ -16,7 +16,10 @@
 
 namespace app\admin\controller;
 
+use app\admin\controller\Openapi;
+use app\data\model\DataConfigCompany;
 use think\admin\Controller;
+use think\admin\extend\CodeExtend;
 use think\admin\helper\QueryHelper;
 use think\admin\model\SystemAuth;
 use think\admin\model\SystemBase;
@@ -25,14 +28,14 @@ use think\admin\model\SystemUser;
 use think\admin\service\AdminService;
 
 /**
- * 站点管理
- * Class Config
- * @package app\admin\controller
+ * 商户管理.
+ * @site admin
  */
 class Site extends Controller
 {
+
     /**
-     * 站点管理
+     * 商户管理
      * @auth true
      * @return void
      * @throws \think\db\exception\DataNotFoundException
@@ -44,16 +47,16 @@ class Site extends Controller
 
         $this->type = $this->get['type'] ?? 'index';
         SystemSite::mQuery()->layTable(function (){
-            $this->title = "站点管理";
+            $this->title = "商户管理";
             $this->username =  AdminService::getUserName();
         },function (QueryHelper $query){
-            $query->with('user');
+            $query->with(['user','wechatAuth']);
             $query->where(['deleted' => 0, 'status' => intval($this->type === 'index')]);
         });
     }
 
     /**
-     * 添加站点
+     * 添加商户
      * @auth true
      * @return void
      */
@@ -62,16 +65,149 @@ class Site extends Controller
     }
 
     /**
-     * 编辑站点
+     * 编辑商户
      * @auth true
      * @return void
      */
     public function edit(){
         SystemSite::mForm('form');
     }
+    protected function _add_form_filter(&$data){
+        if ($this->request->isPost() && empty($data['id']) && ( $id = SystemSite::mk()->getSiteId() )){
+            if (SystemSite::mk()->where('id',$id)->count()>0) $this->error('商户ID重复，请稍后再试');
+            $data['id'] = $id;
+            // 初始化数据
+            $data['openapi'] = [
+                "app_path" => "",
+                "app_code" => "",
+                "appsecret" => ""
+            ];
+            $data['mallapi'] = [
+                "app_path" => "",
+                "app_code" => "",
+                "appsecret" => ""
+            ];
+            $data['accountcfg'] = [
+                "expire" => "3600",
+                "disRegister" => "1",
+                "userPrefix" => "用户",
+                "headimg" =>  "{$this->request->domain()}/static/theme/img/headimg.png",
+                "types" => [
+                    "0" => "wap",
+                    "1" => "web",
+                    "2" => "wxapp",
+                    "3" => "wechat",
+                    "4" => "iosapp",
+                    "5" => "android"
+                ]
+            ];
+            $data['extra'] = [
+                "assistance_plan_document_path" => "",
+                "mentorShare" => [
+                    "imageUrl" => "",
+                    "originalId" => "",
+                    "title" => ""
+                ],
+                "member_fund_amount" => "0",
+                "publish_day" => "",
+                "max_price" => "0.00",
+                "help_rebate" => "0",
+                "is_msg_warning" => "0",
+                "warning_price" => "0.00",
+                "is_msg_arrears" => "0",
+                "is_msg_stop" => "0",
+                "create_member_is_msg" => "0",
+                "remove_member_is_msg" => "0",
+                "create_employee_is_msg" => "0",
+                "downsizing_clean_member_fund" => "0",
+                "update_member_is_msg" => "0",
+                "default_company_id" => "",
+                "default_agency_id" => "",
+                "default_agency_code" => ""
+            ];
+            $data['pagecfg'] = [
+                "user_privacy" => [
+                    "name" => "隐私权政策",
+                    "content" => "",
+                    "code" => "user_privacy"
+                ],
+                "user_agreement" => [
+                    "name" => "用户协议",
+                    "content" => "",
+                    "code" => "user_agreement"
+                ]
+            ];
+            $data['ordercfg'] = [
+                "cancel_family_auto" => "0",
+                "cancel_family_time" => "0.50",
+                "cancel_family_text" => "",
+                "remove_family_auto" => "0",
+                "remove_family_time" => "0.50",
+                "remove_family_text" => "",
+                "cancel_recharge_auto" => "0",
+                "cancel_recharge_time" => "0.50",
+                "cancel_recharge_text" => "",
+                "remove_recharge_auto" => "0",
+                "remove_recharge_time" => "0.50",
+                "remove_recharge_text" => ""
+            ];
+            $data['contractcfg'] = [
+                "emp" => [
+                    "state" => "0",
+                    "auth" => "0",
+                    "flowName" => "",
+                    "essAccountId" => "",
+                    "key" => "",
+                    "token" => "",
+                    "secretId" => "",
+                    "secretKey" => "",
+                    "templateId" => "",
+                    "userId" => "",
+                    "endPoint" => "",
+                    "organizationName" => "",
+                    "expireTime" => "0",
+                    "wechatAppid" => "",
+                    "wechatOriginal" => ""
+                ]
+            ];
+        }
+    }
+
+    protected function _add_form_result($result, $edata) {
+        if ($result !== false && ( $siteId = $edata['id'] ) ){
+            $info = DataConfigCompany::mk()->where(['site_id' => $siteId,'deleted' => 0 ])->findOrEmpty();
+            if ($info->isEmpty()){
+                $info->setAttrs([
+                    'site_id' => $siteId,  'code' => DataConfigCompany::mk()->getCode(),
+                    'name' => $edata['name'], 'is_default' => 1,
+                ]);
+                $info->save();
+            }
+        }
+    }
 
     /**
-     * 修改站点状态
+     * 中间件参数
+     * @return void
+     */
+    public function openapi(): void
+    {
+        SystemSite::mForm('openapi/form');
+    }
+    protected function _openapi_form_filter(&$data){
+        if ($this->request->isGet()){
+            if (empty($this->geoip)) {
+                $this->geoip = gethostbyname($this->request->host());
+                $this->app->cache->set('mygeoip', $this->geoip, 360);
+            }
+            $vars = CodeExtend::enSafe64(json_encode( ['site_id' => $data['id']] , 64 | 256));
+            $this->thrNotify = sysuri('@openapi-notify', [], false, true). "/{$vars}";
+            $data = array_merge(['id' => $data['id']],$data['openapi']);
+        }
+    }
+
+    /**
+     * 修改商户状态
      * @auth true
      */
     public function state()
@@ -82,7 +218,7 @@ class Site extends Controller
         ]));
     }
     /**
-     * 删除站点
+     * 删除商户
      * @auth true
      */
     public function remove()
@@ -114,7 +250,6 @@ class Site extends Controller
 
                 // 检查资料是否完整
                 empty($data['username']) && $this->error('登录账号不能为空！');
-                empty($data['authorize']) && $this->error('未配置权限！');
 
                 $data['site_id'] = $site_id;
                 $data['usertype'] = 'site';
@@ -132,8 +267,7 @@ class Site extends Controller
             }
         }else{
             // 权限绑定处理
-            $data['authorize'] = str2arr($data['authorize'] ?? '');
-            $this->auths = SystemAuth::items();
+//            $this->auths = SystemAuth::items();
             $this->bases = SystemBase::items('身份权限');
             $this->super = AdminService::getSuperName();
         }
@@ -156,7 +290,7 @@ class Site extends Controller
     }
 
     /**
-     * * 切换站点
+     * * 切换商户
      * @auth true
      * @return void
      */
@@ -166,7 +300,7 @@ class Site extends Controller
         ]);
         $site = SystemSite::mk()->with('user')->where($map)->findOrEmpty();
         $user = $site->getAttr('user');
-//        $this->app->session->destroy();
+        $this->app->session->set('adminUser',$user['id'] );
         $this->app->session->set('user', $user->toArray());
         $this->success('登录成功', sysuri('admin/index/index'));
     }

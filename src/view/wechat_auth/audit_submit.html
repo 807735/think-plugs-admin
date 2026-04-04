@@ -1,0 +1,50 @@
+<form action="{:request()->url()}" method="post" data-auto="true" class="layui-form layui-card shadow-none">
+
+    <div class="layui-card-body">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label"><b>版本描述</b><br><span class="nowrap color-desc">小程序版本说明和功能解释</span></label>
+            <div class="layui-input-block">
+               <textarea class="layui-textarea" name="data.version_desc" placeholder="小程序版本说明和功能解释"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label"><b>小程页面</b><br><span class="nowrap color-desc">接口认证令牌</span></label>
+            <div class="layui-input-block">
+                <input name="page" required vali-name="认证TOKEN" placeholder="请输入消息推送对接认证Token（必填）" value="{$vo.page|default=''}" class="layui-input">
+                <p class="help-block">公众号平台与系统对接认证Token，请优先填写此参数并保存，然后再在微信公众号平台操作对接。</p>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label"><b>选择类目</b><br><span class="nowrap color-desc">公众号 APPID</span></label>
+            <div class="layui-input-block">
+                <select name="cate">
+                    <option value="">==请选择==</option>
+                    {foreach $cate_list as $cate}
+                    <option value="{$cate.value}">{$cate.first_class} / {$cate.second_class}</option>
+                    {/foreach}
+                </select>
+                <p class="help-block">公众号APPID是所有接口必要参数，可以在公众号平台 [ 开发 > 基本配置 ] 页面获取。</p>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label"><b>小程序订单中心path</b><br><span class="nowrap color-desc">接口认证令牌</span></label>
+            <div class="layui-input-block">
+                <input name="data.order_path" required vali-name="认证TOKEN" placeholder="请输入消息推送对接认证Token（必填）" value="{$vo.order_path|default=''}" class="layui-input">
+                <p class="help-block">path内勿含参数了解详情;  提醒：交易类小程序需提交订单中心path，否则代码审核将不通过。</p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    <input type="hidden" name="config.type" value="api">
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type="submit">保存配置</button>
+    </div>
+</form>

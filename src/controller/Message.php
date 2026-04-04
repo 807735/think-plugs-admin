@@ -28,6 +28,7 @@ use think\admin\service\OpenService;
 /**
  * 短信计划管理
  * @class Message
+ * @site site
  * @package app\manage\controller
  */
 class Message extends Controller

@@ -1,0 +1,20 @@
+<div  class="layui-form layui-card layui-form-pane" data-table-id="DiscountTable">
+    <div class="padding-10" style="height: 520px;">
+        <pre class="layui-code " lay-options="{theme: 'dark'}" id="jsonOutput" ></pre>
+    </div>
+</div>
+
+
+<script>
+    require(['jquery'], function ( ) {
+        (function () {
+            let jsonData = '{$vo[$get.type]|raw|default=""}';
+            var prettyJson = JSON.stringify(JSON.parse(jsonData), null, 2);
+            $('#jsonOutput').text(prettyJson);
+            layui.code({
+                elem: '.layui-code',
+                style: "height:500px"
+            });
+        })()
+    });
+</script>

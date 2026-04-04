@@ -2,14 +2,14 @@
 
 {block name="button"}
 <!--{if auth("add")}-->
-<button data-table-id="SiteTable" data-modal='{:url("add")}' data-width="500px" class='layui-btn layui-btn-sm layui-btn-primary'>添加站点</button>
+<button data-table-id="SiteTable" data-modal='{:url("add")}' data-width="500px" class='layui-btn layui-btn-sm layui-btn-primary'>添加商户</button>
 <!--{/if}-->
 {/block}
 
 {block name="content"}
 <div class="layui-tab layui-tab-card">
     <ul class="layui-tab-title">
-        {foreach ['index'=>lang('站点管理'),'recycle'=>lang('回 收 站')] as $k=>$v}{if isset($type) and $type eq $k}
+        {foreach ['index'=>lang('商户管理'),'recycle'=>lang('回 收 站')] as $k=>$v}{if isset($type) and $type eq $k}
         <li data-open="{:url('index')}?type={$k}" class="layui-this">{$v}</li>
         {else}
         <li data-open="{:url('index')}?type={$k}">{$v}</li>
@@ -29,10 +29,17 @@
             sort: {field: 'id', type: 'desc'},
             where: {type: "{$get.type|default='index'}"},
             cols: [[
-                {field: 'id', hide: true},
-                {field: 'name', title: '站点名称', align: 'left', width: 150},
+                {field: 'id', title: '商户ID', align: 'center', width: 115},
+                {field: 'name', title: '商户名称', align: 'left', width: 150},
+                {field: 'people_limit', title: '人数限制', align: 'center', width: 80,templet:(d) => {
+                    return `限制 <b>${d.people_limit}</b>   人`
+                }},
+                {field: 'user_id', title: '绑定小程序', align: 'left', minWidth: 200, templet: '#WechatTpl'},
                 {field: 'user_id', title: '管理员账号', align: 'left', minWidth: 200, templet: '#ManageTpl'},
                 {field: 'status', title: '使用状态', align: 'center', width: 110, templet: '#StatusSwitchTpl'},
+                {field: 'expire_time', title: '到期时间', align: 'center', width: 145,templet:(d) =>{
+                    return d.expire_time ? `${d.expire_time} 23:59:59` : '<span class="layui-font-gray">永久有效</span>  '
+                }},
                 {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', width: 260, fixed: 'right'}
             ]]
         });
@@ -51,13 +58,20 @@
     });
 
 </script>
+<script type="text/html" id="WechatTpl">
+    {{# if(d.wechatcfg.type == 'thr' && d.wechatAuth?.id){ }}
+        {{d.wechatAuth.user_nickname}} /  {{d.wechatAuth.service_type}} /  {{d.wechatAuth.service_verify}}
+    {{# }else{ }}
+        <span class="layui-font-gray">暂未绑定</span>
+    {{# } }}
+</script>
+
 <script type="text/html" id="ManageTpl">
     {{# if(d.user_id>0){ }}
     {{d.user?.username}} 【{{d.user?.nickname}}】
-    <a class="margin-left-10" data-action="{:url('unbind')}" data-rule="id#{{d.id}};user_id#{{d.user_id}}"  data-confirm="确认解除绑定信息么">解除绑定</a>
+    <a class="margin-left-10" data-action="{:url('unbind')}" data-rule="id#{{d.id}};user_id#{{d.user_id}}"  data-confirm="确认解除绑定信息么">解绑</a>
     {{# }else{ }}
-    <span class="layui-font-red">== 未绑定 ==</span>
-    <a class="margin-left-10" data-modal="{:url('bindManage')}?id={{d.id}}">绑定账户</a>
+    <a data-modal="{:url('bindManage')}?id={{d.id}}">绑定管理员</a>
     {{# } }}
 </script>
 
@@ -72,18 +86,23 @@
 <script type="text/html" id="toolbar">
     {if isset($type) and $type eq 'index'}
     <!--{if auth("edit")}-->
-    <a class="layui-btn layui-btn-sm" data-event-dbclick data-width="500px" data-title="{:lang('编辑站点')}" data-modal='{:url("edit")}?id={{d.id}}'>{:lang('编 辑')}</a>
+    <a class="layui-btn layui-btn-sm" data-event-dbclick data-width="500px" data-title="{:lang('编辑商户')}" data-modal='{:url("edit")}?id={{d.id}}'>{:lang('编 辑')}</a>
     <!--{/if}-->
+
+
+    <a class="layui-btn layui-btn-sm" data-width="500px" data-title="{:lang('编辑中间件参数')}" data-modal='{:url("openapi")}?id={{d.id}}'>{:lang('中间件')}</a>
+    <!--{if auth("openapi")}-->  <!--{/if}-->
+
     <!--{if auth("manage")}-->
     <a class="layui-btn layui-btn-sm layui-btn-normal" data-title="{:lang('设置管理员')}" data-modal='{:url("manage")}?id={{d.id}}'>{:lang('管理员')}</a>
     <!--{/if}-->
     <!--{if auth("switchSite")}-->
-    <a class="layui-btn layui-btn-sm layui-btn-danger" data-title="{:lang('切换到站点')}"
-       data-site="{:url('switchSite')}" data-value="id#{{d.id}}" data-confirm="切换站点将退出当前【{$username}】账号<br/>并切换到对应站点管理员账号；<br/>确认切换到当前站点么？">{:lang('切换站点')}</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" data-title="{:lang('切换到商户')}"
+       data-site="{:url('switchSite')}" data-value="id#{{d.id}}" data-confirm="切换商户将退出当前【{$username}】账号<br/>并切换到对应商户管理员账号；<br/>确认切换到当前商户么？">{:lang('切换商户')}</a>
     <!--{/if}-->
     {else}
     <!--{if auth("edit")}-->
-    <a class="layui-btn layui-btn-sm" data-event-dbclick data-width="500px" data-title="{:lang('编辑站点')}" data-modal='{:url("edit")}?id={{d.id}}'>{:lang('编 辑')}</a>
+    <a class="layui-btn layui-btn-sm" data-event-dbclick data-width="500px" data-title="{:lang('编辑商户')}" data-modal='{:url("edit")}?id={{d.id}}'>{:lang('编 辑')}</a>
     <!--{/if}-->
     <!--{if auth("remove")}-->
     <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="{:lang('确定要永久删除吗？')}" data-action="{:url('remove')}" data-value="id#{{d.id}}">{:lang('删 除')}</a>
